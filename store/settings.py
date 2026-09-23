@@ -130,6 +130,9 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'  # Files will upload to a 'media' folder next to manage.py
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://farm-produce-ten.vercel.app",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
