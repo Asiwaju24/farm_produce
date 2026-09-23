@@ -29,7 +29,11 @@ SECRET_KEY = 'django-insecure-tvh#pa93&a1#o++hi_s+3app!^6kovz8u7#3+5u=z-qs-6%vvm
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "farm-produce-ten.vercel.app",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
@@ -130,6 +134,9 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'  # Files will upload to a 'media' folder next to manage.py
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://farm-produce-ten.vercel.app",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
