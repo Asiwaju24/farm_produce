@@ -1,0 +1,3653 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshHarvest | Premium Fresh Fruits & Organic Produce</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#1E3A2B',     // Deep Forest Green
+                            medium: '#2A523B',   // Forest Accent
+                            light: '#37694C',    // Light Forest
+                            lemon: '#E2F163',    // Soft Sun-Kissed Lemon / Accent
+                            lemonHover: '#D4E44C',
+                            surface: '#F8FAFC',  // Cool Off-White Background
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Modal Backdrops */
+        .modal-backdrop {
+            background-color: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(6px);
+        }
+        /* Smooth scale animation */
+        .pop-in {
+            animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-brand-surface font-sans text-slate-800 antialiased min-h-screen flex flex-col selection:bg-brand-lemon selection:text-brand-dark">
+    {% if messages %}
+        <div class="fixed top-24 right-5 z-[70] flex flex-col gap-2 max-w-sm">
+            {% for message in messages %}
+                <div class="bg-brand-dark text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-white/10">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-brand-dark text-slate-100 text-xs md:text-sm font-medium py-2 px-4 text-center flex items-center justify-center gap-2 border-b border-brand-light/20">
+        <span class="inline-flex items-center gap-1.5 bg-brand-lemon/20 text-brand-lemon px-2 py-0.5 rounded-full text-xs font-semibold">
+            <i class="fa-solid fa-shield-halved text-[10px]"></i> 100% Safe
+        </span>
+        <span><strong>Pay-On-Delivery Available:</strong> Inspect & taste freshness at your doorstep before paying via Cash, POS Card Terminal, or Bank Transfer!</span>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-200/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            
+            <!-- Logo -->
+            <a href="#" onclick="filterCategory('all')" class="flex items-center gap-2.5 group">
+                <div class="w-11 h-11 rounded-2xl bg-brand-dark flex items-center justify-center text-brand-lemon font-black text-2xl shadow-md group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-lemon"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold text-brand-dark tracking-tight leading-none block">FreshHarvest</span>
+                    <span class="text-[10px] font-semibold tracking-wider text-slate-500 uppercase block">Organic Fruit Market</span>
+                </div>
+            </a>
+
+            <!-- Search Bar (Desktop) -->
+            <div class="hidden md:flex flex-1 max-w-md mx-8 relative">
+                <input 
+                    type="text" 
+                    id="searchInput"
+                    oninput="handleSearch(this.value)"
+                    placeholder="Search fresh avocados, apples, berries, tropical mix..." 
+                    class="w-full bg-slate-100/90 hover:bg-slate-100 focus:bg-white text-slate-800 placeholder-slate-400 pl-11 pr-10 py-2.5 rounded-full border border-transparent focus:border-brand-dark focus:ring-2 focus:ring-brand-dark/10 outline-none transition-all text-sm font-medium"
+                >
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-sm">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Account + Action Controls -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                {% if is_authenticated %}
+                    <button onclick="logoutUser()" class="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-brand-dark px-3 py-2 rounded-full hover:bg-slate-100 transition-colors">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
+                {% else %}
+                    <button onclick="openAuthModal('login')" class="hidden sm:flex items-center gap-2 text-xs font-bold text-brand-dark px-3 py-2 rounded-full hover:bg-slate-100 transition-colors">
+                        <i class="fa-solid fa-user"></i> Sign in
+                    </button>
+                {% endif %}
+
+                <!-- Action Controls (Wishlist, Cart) -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Search Toggle Button (Mobile) -->
+                <button onclick="toggleMobileSearch()" class="md:hidden w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+
+                <!-- Wishlist Badge Counter -->
+                <button onclick="openWishlistModal()" class="relative w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 text-brand-dark flex items-center justify-center transition-colors">
+                    <i class="fa-regular fa-heart text-lg"></i>
+                    <span id="wishlistCount" class="absolute -top-1 -right-1 bg-rose-500 text-white font-bold text-[10px] w-5 h-5 rounded-full flex items-center justify-center shadow-sm">0</span>
+                </button>
+
+                <!-- Cart Button Trigger -->
+                <button onclick="toggleCartDrawer()" class="relative flex items-center gap-2 bg-brand-dark hover:bg-brand-medium text-white px-4 py-2.5 rounded-full transition-all shadow-sm hover:shadow active:scale-95">
+                    <i class="fa-solid fa-basket-shopping text-brand-lemon"></i>
+                    <span class="font-bold text-sm hidden sm:inline">Cart</span>
+                    <span id="cartCountBadge" class="bg-brand-lemon text-brand-dark font-extrabold text-xs px-2 py-0.5 rounded-full">0</span>
+                </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Search Dropdown -->
+        <div id="mobileSearchContainer" class="hidden md:hidden px-4 pb-4 border-t border-slate-100 pt-3">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="mobileSearchInput"
+                    oninput="handleSearch(this.value)"
+                    placeholder="Search organic fruits..." 
+                    class="w-full bg-slate-100 text-slate-800 placeholder-slate-400 pl-10 pr-10 py-2.5 rounded-full border border-slate-200 focus:outline-none focus:border-brand-dark text-sm"
+                >
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner Section -->
+    <section class="bg-gradient-to-r from-brand-dark via-brand-medium to-brand-dark text-white py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="max-w-xl text-center md:text-left">
+                <span class="inline-block bg-brand-lemon/20 text-brand-lemon text-xs font-extrabold tracking-wider uppercase px-3 py-1 rounded-full mb-3">
+                    <i class="fa-solid fa-seedling mr-1"></i> Farm Fresh Harvest Guarantee
+                </span>
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
+                    Pure Freshness Delivered <span class="text-brand-lemon">To Your Door</span>
+                </h1>
+                <p class="mt-3 text-slate-200 text-sm sm:text-base leading-relaxed">
+                    Sourced directly from certified organic local orchards. Enjoy premium tree-ripened fruits with complete peace of mind.
+                </p>
+                <div class="mt-6 flex flex-wrap items-center justify-center md:justify-start gap-4 text-xs font-semibold text-slate-300">
+                    <span class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+                        <i class="fa-solid fa-truck-fast text-brand-lemon"></i> Same-Day Delivery
+                    </span>
+                    <span class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+                        <i class="fa-solid fa-hand-holding-dollar text-brand-lemon"></i> Pay On Delivery
+                    </span>
+                    <span class="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+                        <i class="fa-solid fa-apple-whole text-brand-lemon"></i> 100% Organic
+                    </span>
+                </div>
+            </div>
+            
+            <div class="flex-shrink-0 w-full max-w-xs md:max-w-sm bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/20 shadow-xl text-center">
+                <div class="w-16 h-16 bg-brand-lemon/20 rounded-full flex items-center justify-center text-brand-lemon text-2xl mx-auto mb-3">
+                    <i class="fa-solid fa-truck-ramp-box"></i>
+                </div>
+                <h3 class="font-bold text-white text-base">Doorstep Quality Inspection</h3>
+                <p class="text-xs text-slate-200 mt-1">Open your fruit crate, inspect freshness with our delivery personnel, then pay using cash, POS card, or transfer!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Filter Bar -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Category Navigation Buttons -->
+        <div class="flex items-center justify-between gap-4 mb-8 overflow-x-auto pb-2 scrollbar-none">
+            <div class="flex items-center gap-2" id="categoryButtonsContainer">
+                <!-- Categories dynamically loaded by JS -->
+            </div>
+            <div class="text-xs font-medium text-slate-500 whitespace-nowrap hidden sm:block">
+                Showing <span id="displayedCount" class="font-bold text-slate-800">0</span> Fruits
+            </div>
+        </div>
+
+        <!-- Main Products Grid -->
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Product cards will be dynamically rendered here -->
+        </div>
+
+        <!-- Empty Search State -->
+        <div id="emptyState" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200 p-8">
+            <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 text-3xl mx-auto mb-4">
+                <i class="fa-solid fa-lemon"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800">No Fresh Fruits Found</h3>
+            <p class="text-sm text-slate-500 mt-1 max-w-md mx-auto">We couldn't find any produce matching your current search or category filter. Try clearing filters!</p>
+            <button onclick="resetFilters()" class="mt-5 bg-brand-dark text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-brand-medium transition-colors">
+                Reset All Filters
+            </button>
+        </div>
+
+    </main>
+
+    <!-- RICH PRODUCT DETAIL MODAL POPUP -->
+    <div id="productModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <!-- Backdrop overlay -->
+        <div onclick="closeProductModal()" class="fixed inset-0 modal-backdrop transition-opacity"></div>
+
+        <div class="min-h-screen px-4 text-center flex items-center justify-center py-6 sm:py-10">
+            <!-- Modal Box Container -->
+            <div class="inline-block w-full max-w-4xl bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all relative z-10 pop-in border border-slate-100 my-auto">
+                
+                <!-- Close Button -->
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors shadow-sm">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+
+                <div class="grid grid-cols-1 md:grid-cols-2">
+                    
+                    <!-- Left Column: Gallery & Images -->
+                    <div class="bg-slate-50 p-6 flex flex-col justify-between border-b md:border-b-0 md:border-r border-slate-200/80">
+                        <div>
+                            <!-- Main High Res Image Display -->
+                            <div class="relative bg-white rounded-2xl p-4 shadow-sm border border-slate-100 overflow-hidden group">
+                                <span id="modalOrganicBadge" class="absolute top-3 left-3 bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 z-10">
+                                    <i class="fa-solid fa-leaf text-emerald-600"></i> USDA Organic
+                                </span>
+                                <img id="modalMainImage" src="" alt="Fruit Detail" class="w-full h-64 sm:h-72 object-contain mx-auto transition-transform duration-300 group-hover:scale-105">
+                            </div>
+
+                            <!-- Thumbnail switcher -->
+                            <div id="modalThumbnails" class="flex items-center gap-3 mt-4 overflow-x-auto pb-1">
+                                <!-- Thumbnails injected via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Pay-On-Delivery Trust Box -->
+                        <div class="mt-6 bg-emerald-50/80 border border-emerald-200/60 rounded-2xl p-4">
+                            <div class="flex items-center gap-2 text-emerald-900 font-bold text-xs uppercase tracking-wider mb-1">
+                                <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i> Freshness Guarantee & Pay On Delivery
+                            </div>
+                            <p class="text-xs text-emerald-800 leading-relaxed">
+                                Inspect product quality upon delivery before handing over cash, using card terminal POS, or instant transfer.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Fruit Specs & Purchasing -->
+                    <div class="p-6 sm:p-8 flex flex-col justify-between">
+                        <div>
+                            <!-- Breadcrumb & Category -->
+                            <div class="flex items-center justify-between text-xs text-slate-500 font-medium mb-2">
+                                <span id="modalCategoryName" class="text-brand-dark font-bold uppercase tracking-wider bg-brand-lemon/30 px-2.5 py-0.5 rounded-md">Category</span>
+                                <span id="modalStockStatus" class="text-emerald-600 font-semibold flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> In Stock
+                                </span>
+                            </div>
+
+                            <!-- Title & Price Header -->
+                            <h2 id="modalTitle" class="text-2xl sm:text-3xl font-extrabold text-brand-dark tracking-tight">Fruit Name</h2>
+                            
+                            <!-- Rating -->
+                            <div class="flex items-center gap-2 mt-2">
+                                <div class="flex text-amber-400 text-xs" id="modalRatingStars"></div>
+                                <span id="modalRatingScore" class="text-xs font-bold text-slate-700">4.9</span>
+                                <span class="text-slate-300">•</span>
+                                <span id="modalReviewCount" class="text-xs text-slate-500 underline cursor-pointer">128 reviews</span>
+                            </div>
+
+                            <!-- Dynamic Price Display -->
+                            <div class="mt-4 flex items-baseline gap-3">
+                                <span id="modalUnitPrice" class="text-3xl font-black text-brand-dark">₦0.00</span>
+                                <span id="modalUnitType" class="text-sm font-semibold text-slate-500">per kg</span>
+                            </div>
+
+                            <!-- Description -->
+                            <p id="modalDescription" class="mt-3 text-sm text-slate-600 leading-relaxed">
+                                High-quality description of the fruit loaded here.
+                            </p>
+
+                            <!-- Farm Traceability Card -->
+                            <div class="mt-5 bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-500"><i class="fa-solid fa-location-dot text-brand-dark mr-1"></i> Farm Origin:</span>
+                                    <span id="modalFarmOrigin" class="font-semibold text-slate-800">Sun Valley Organic Orchards</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-500"><i class="fa-solid fa-calendar-day text-brand-dark mr-1"></i> Harvest Date:</span>
+                                    <span id="modalHarvestDate" class="font-semibold text-slate-800">Freshly Harvested 2 days ago</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-slate-500"><i class="fa-solid fa-hourglass-half text-brand-dark mr-1"></i> Shelf Life:</span>
+                                    <span id="modalShelfLife" class="font-semibold text-slate-800">5 - 7 Days</span>
+                                </div>
+                            </div>
+
+                            <!-- Nutritional Bar -->
+                            <div class="mt-5">
+                                <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Nutritional Highlights (Per 100g)</h4>
+                                <div class="grid grid-cols-4 gap-2 text-center text-xs">
+                                    <div class="bg-slate-100 p-2 rounded-xl">
+                                        <span class="block font-bold text-brand-dark" id="modalCal">-</span>
+                                        <span class="text-[10px] text-slate-500">Calories</span>
+                                    </div>
+                                    <div class="bg-slate-100 p-2 rounded-xl">
+                                        <span class="block font-bold text-brand-dark" id="modalFiber">-</span>
+                                        <span class="text-[10px] text-slate-500">Fiber</span>
+                                    </div>
+                                    <div class="bg-slate-100 p-2 rounded-xl">
+                                        <span class="block font-bold text-brand-dark" id="modalPotassium">-</span>
+                                        <span class="text-[10px] text-slate-500">Potassium</span>
+                                    </div>
+                                    <div class="bg-slate-100 p-2 rounded-xl">
+                                        <span class="block font-bold text-brand-dark" id="modalVit">-</span>
+                                        <span class="text-[10px] text-slate-500">Vitamins</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quantity Selector -->
+                            <div class="mt-6 flex items-center justify-between gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1">Select Quantity</label>
+                                    <div class="flex items-center border border-slate-300 rounded-full bg-slate-50 p-1">
+                                        <button onclick="updateModalQuantity(-1)" class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-700 hover:bg-slate-100 active:scale-95 transition-all">
+                                            <i class="fa-solid fa-minus text-xs"></i>
+                                        </button>
+                                        <span id="modalQtyDisplay" class="w-12 text-center font-bold text-brand-dark text-base">1</span>
+                                        <button onclick="updateModalQuantity(1)" class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-700 hover:bg-slate-100 active:scale-95 transition-all">
+                                            <i class="fa-solid fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="text-right">
+                                    <span class="block text-xs text-slate-500">Total Price</span>
+                                    <span id="modalTotalPrice" class="text-2xl font-black text-brand-dark">₦0.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add to Cart Modal Action Button -->
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center gap-3">
+                            <button id="modalWishlistBtn" onclick="toggleModalWishlist()" class="w-12 h-12 rounded-2xl border border-slate-200 text-slate-600 hover:text-rose-500 hover:border-rose-200 flex items-center justify-center transition-colors text-lg">
+                                <i id="modalWishlistIcon" class="fa-regular fa-heart"></i>
+                            </button>
+
+                            <button onclick="addModalItemToCart()" class="flex-1 bg-brand-lemon hover:bg-brand-lemonHover text-brand-dark font-extrabold py-3.5 px-6 rounded-2xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-98">
+                                <i class="fa-solid fa-basket-shopping text-base"></i>
+                                <span>Add To Basket</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUTHENTICATION MODAL -->
+    <div id="authModal" class="fixed inset-0 z-[80] hidden overflow-y-auto">
+        <div onclick="closeAuthModal()" class="fixed inset-0 modal-backdrop"></div>
+
+        <div class="relative min-h-full flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden relative">
+                <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wider text-brand-light">FreshHarvest Account</p>
+                        <h2 id="authModalTitle" class="text-2xl font-black text-brand-dark mt-1">Welcome Back</h2>
+                    </div>
+                    <button onclick="closeAuthModal()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <div class="grid grid-cols-2 bg-slate-100 rounded-xl p-1 mb-6">
+                        <button id="loginTab" onclick="switchAuthMode('login')" class="py-2.5 rounded-lg text-xs font-extrabold bg-white text-brand-dark shadow-sm">Sign In</button>
+                        <button id="signupTab" onclick="switchAuthMode('signup')" class="py-2.5 rounded-lg text-xs font-extrabold text-slate-500">Create Account</button>
+                    </div>
+
+                    <form id="loginForm" method="POST" action="{{ login_url }}" class="space-y-4">
+                        {% csrf_token %}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Username</label>
+                            <input name="username" required autocomplete="username" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark" placeholder="Your username">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+                            <input type="password" name="password" required autocomplete="current-password" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark" placeholder="Your password">
+                        </div>
+                        <button class="w-full bg-brand-dark hover:bg-brand-medium text-brand-lemon font-extrabold py-3.5 rounded-2xl">Sign In</button>
+                    </form>
+
+                    <form id="signupForm" method="POST" action="{{ signup_url }}" class="space-y-4 hidden">
+                        {% csrf_token %}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
+                            <input name="full_name" required autocomplete="name" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark" placeholder="Your full name">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Username *</label>
+                                <input name="username" required autocomplete="username" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark" placeholder="Choose a username">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Phone</label>
+                                <input name="phone_number" type="tel" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark" placeholder="080..."></div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Email *</label>
+                            <input name="email" type="email" required autocomplete="email" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark" placeholder="you@example.com">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Password *</label>
+                                <input name="password" type="password" required minlength="8" autocomplete="new-password" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark" placeholder="At least 8 characters">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Confirm Password *</label>
+                                <input name="password_confirmation" type="password" required minlength="8" autocomplete="new-password" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark" placeholder="Repeat password">
+                            </div>
+                        </div>
+                        <button class="w-full bg-brand-dark hover:bg-brand-medium text-brand-lemon font-extrabold py-3.5 rounded-2xl">Create Account</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE-OVER CART DRAWER -->
+    <div id="cartDrawer" class="fixed inset-0 z-50 hidden overflow-hidden">
+        <div onclick="toggleCartDrawer()" class="absolute inset-0 modal-backdrop transition-opacity"></div>
+
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+            <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col justify-between">
+                
+                <!-- Drawer Header -->
+                <div class="p-6 bg-brand-dark text-white flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-basket-shopping text-brand-lemon text-xl"></i>
+                        <h2 class="text-lg font-bold">Your Fruit Basket</h2>
+                    </div>
+                    <button onclick="toggleCartDrawer()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Free Shipping Progress -->
+                <div class="bg-brand-lemon/20 p-3.5 px-6 border-b border-slate-200">
+                    <div class="flex justify-between text-xs font-bold text-brand-dark mb-1">
+                        <span id="freeShippingText">Add ₦15.00 for FREE Local Delivery</span>
+                        <span id="freeShippingPercent">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div id="freeShippingBar" class="bg-brand-dark h-full transition-all duration-300 w-0"></div>
+                    </div>
+                </div>
+
+                <!-- Cart Items List -->
+                <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-6 space-y-4">
+                    <!-- Dynamic cart items rendered here -->
+                </div>
+
+                <!-- Drawer Footer & Checkout -->
+                <div class="p-6 border-t border-slate-200 bg-slate-50 space-y-4">
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between text-slate-600">
+                            <span>Subtotal</span>
+                            <span id="cartSubtotal" class="font-semibold text-slate-800">₦0.00</span>
+                        </div>
+                        <div class="flex justify-between text-slate-600">
+                            <span>Estimated Delivery Fee</span>
+                            <span id="cartDeliveryFee" class="font-semibold text-slate-800">₦3.99</span>
+                        </div>
+                        <div class="flex justify-between text-base font-extrabold text-brand-dark pt-2 border-t border-slate-200">
+                            <span>Total Payable</span>
+                            <span id="cartTotal" class="text-xl">₦0.00</span>
+                        </div>
+                    </div>
+
+                    <button onclick="openCheckoutModal()" id="checkoutBtn" class="w-full bg-brand-dark hover:bg-brand-medium text-brand-lemon font-extrabold py-4 px-6 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 active:scale-98">
+                        <span>Proceed To Pay-On-Delivery</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                    <p class="text-center text-[11px] text-slate-500">
+                        <i class="fa-solid fa-shield-check text-emerald-600 mr-1"></i> Pay with Cash, POS Card, or Bank Transfer at your door
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PAY-ON-DELIVERY CHECKOUT MODAL -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div onclick="closeCheckoutModal()" class="fixed inset-0 modal-backdrop"></div>
+
+        <div class="min-h-screen px-4 flex items-center justify-center py-10">
+            <div class="inline-block w-full max-w-xl bg-white rounded-3xl text-left overflow-hidden shadow-2xl pop-in relative z-10 p-6 sm:p-8">
+                
+                <button onclick="closeCheckoutModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-brand-lemon/30 text-brand-dark flex items-center justify-center font-bold text-lg">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold text-brand-dark">Pay-On-Delivery Checkout</h3>
+                        <p class="text-xs text-slate-500">No upfront card charge required. Inspect upon arrival!</p>
+                    </div>
+                </div>
+
+                <form id="checkoutForm" method="POST" action="{% url 'app:place_order' %}" class="space-y-4">
+                    {% csrf_token %}
+
+                    <!-- Delivery Details -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
+                            <input
+                                type="text"
+                                name="full_name"
+                                value="{{ request.user.full_name|default:'' }}"
+                                required
+                                placeholder="e.g. Jane Doe"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark"
+                            >
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Phone Number *</label>
+                            <input
+                                type="tel"
+                                name="phone_number"
+                                value="{{ request.user.phone_number|default:'' }}"
+                                required
+                                placeholder="e.g. 08012345678"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Street Delivery Address *</label>
+                        <input
+                            type="text"
+                            name="street"
+                            required
+                            placeholder="House number, street name, apartment/suite"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark"
+                        >
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">City *</label>
+                            <input
+                                type="text"
+                                name="city"
+                                required
+                                placeholder="e.g. Ilorin"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark"
+                            >
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">State *</label>
+                            <input
+                                type="text"
+                                name="state"
+                                required
+                                placeholder="e.g. Kwara"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Postal Code</label>
+                            <input
+                                type="text"
+                                name="postal_code"
+                                placeholder="e.g. 240001"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark"
+                            >
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Country *</label>
+                            <input
+                                type="text"
+                                name="country"
+                                value="Nigeria"
+                                required
+                                class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-brand-dark"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Payment Method at Doorstep Selection -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-2">Doorstep Payment Choice *</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="pod_method" value="cash" checked class="peer sr-only">
+                                <div class="p-3 border border-slate-200 rounded-xl text-center peer-checked:border-brand-dark peer-checked:bg-brand-lemon/20 transition-all">
+                                    <i class="fa-solid fa-money-bill-wave text-emerald-600 text-lg block mb-1"></i>
+                                    <span class="text-xs font-bold text-slate-800">Cash</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="pod_method" value="pos" class="peer sr-only">
+                                <div class="p-3 border border-slate-200 rounded-xl text-center peer-checked:border-brand-dark peer-checked:bg-brand-lemon/20 transition-all">
+                                    <i class="fa-solid fa-credit-card text-brand-dark text-lg block mb-1"></i>
+                                    <span class="text-xs font-bold text-slate-800">Rider POS</span>
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="pod_method" value="transfer" class="peer sr-only">
+                                <div class="p-3 border border-slate-200 rounded-xl text-center peer-checked:border-brand-dark peer-checked:bg-brand-lemon/20 transition-all">
+                                    <i class="fa-solid fa-mobile-screen-button text-blue-600 text-lg block mb-1"></i>
+                                    <span class="text-xs font-bold text-slate-800">Transfer</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Order Total Summary -->
+                    <div class="bg-slate-50 p-4 rounded-xl flex justify-between items-center text-sm">
+                        <span class="font-medium text-slate-600">Total Payable at Doorstep:</span>
+                        <span id="checkoutTotalDisplay" class="font-extrabold text-xl text-brand-dark">₦0.00</span>
+                    </div>
+
+                    <button type="submit" class="w-full bg-brand-lemon hover:bg-brand-lemonHover text-brand-dark font-extrabold py-4 rounded-2xl shadow-md transition-all text-base">
+                        Confirm Order Delivery
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS CONFIRMATION MODAL -->
+    <div id="successModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="fixed inset-0 modal-backdrop"></div>
+        <div class="min-h-screen px-4 flex items-center justify-center py-10">
+            <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center pop-in relative z-10 shadow-2xl">
+                <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 text-3xl mx-auto mb-4">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h3 class="text-2xl font-extrabold text-brand-dark">Order Confirmed!</h3>
+                <p class="text-xs text-slate-500 mt-1">Order Ref: <span id="orderTrackingId" class="font-bold text-brand-dark">FH-89412</span></p>
+                <p class="text-sm text-slate-600 mt-4 leading-relaxed">
+                    Our local rider will pack your organic fruits and bring them to your doorstep. Remember to inspect freshness before payment!
+                </p>
+                <button onclick="closeSuccessModal()" class="mt-6 w-full bg-brand-dark text-white font-bold py-3.5 rounded-2xl hover:bg-brand-medium transition-colors">
+                    Back To Market
+                </button>
+            </div>
+        </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    {{ product_data|json_script:"product-data" }}
+    {{ category_data|json_script:"category-data" }}
+    {{ cart_data|json_script:"cart-data" }}
+    {{ wishlist_product_ids|json_script:"wishlist-data" }}
+
+    <!-- JavaScript Application Logic -->
+
+<script>
+/* ============================================================
+   FRESHHARVEST FRONTEND APPLICATION
+   Django + AJAX + CSRF
+============================================================ */
+
+
+/* ============================================================
+   SERVER DATA
+============================================================ */
+
+const PRODUCTS = JSON.parse(
+    document.getElementById("product-data").textContent
+);
+
+const CATEGORIES = JSON.parse(
+    document.getElementById("category-data").textContent
+);
+
+let cart = JSON.parse(
+    document.getElementById("cart-data").textContent
+);
+
+let wishlist = new Set(
+    JSON.parse(
+        document.getElementById("wishlist-data").textContent
+    )
+);
+
+let IS_AUTHENTICATED =
+    {{ is_authenticated|yesno:"true,false" }};
+
+const ORDER_PLACED =
+    {{ order_placed|yesno:"true,false" }};
+
+const ORDER_REFERENCE =
+    "{{ order_reference|default:''|escapejs }}";
+
+
+/* ============================================================
+   APPLICATION STATE
+============================================================ */
+
+let currentCategory = "all";
+let searchQuery = "";
+
+let activeModalProduct = null;
+let modalQuantity = 1;
+
+let isRequestRunning = false;
+
+
+/*
+ * Keep these values consistent with the Django backend.
+ *
+ * Current backend:
+ * DELIVERY_FEE = 3.99
+ * FREE_DELIVERY_THRESHOLD = 35.00
+ *
+ * Change both backend and frontend if these values are
+ * actually supposed to be ₦3,990 / ₦35,000, etc.
+ */
+const DELIVERY_FEE = 3.99;
+const FREE_DELIVERY_THRESHOLD = 35.00;
+
+
+/* ============================================================
+   CSRF
+============================================================ */
+
+/*
+ * Always prefer Django's csrftoken cookie.
+ *
+ * Django can rotate the CSRF token after authentication,
+ * so using an old hidden form token first can cause:
+ *
+ * 403 Forbidden
+ * CSRF token from POST incorrect.
+ */
+function getCookie(name) {
+
+    const cookies = document.cookie.split(";");
+
+    for (const cookie of cookies) {
+
+        const trimmed = cookie.trim();
+
+        if (trimmed.startsWith(name + "=")) {
+
+            return decodeURIComponent(
+                trimmed.substring(name.length + 1)
+            );
+        }
+    }
+
+    return null;
+}
+
+
+function getCSRFToken() {
+
+    // 1. Prefer current Django cookie
+    const cookieToken = getCookie("csrftoken");
+
+    if (cookieToken) {
+        return cookieToken;
+    }
+
+    // 2. Fallback to any rendered CSRF input
+    const input = document.querySelector(
+        'input[name="csrfmiddlewaretoken"]'
+    );
+
+    if (input && input.value) {
+        return input.value;
+    }
+
+    return "";
+}
+
+
+/* ============================================================
+   GENERIC DJANGO POST
+============================================================ */
+
+async function postToDjango(url, data = {}) {
+
+    const csrfToken = getCSRFToken();
+
+    if (!csrfToken) {
+        throw new Error(
+            "Security token is missing. Please refresh the page and try again."
+        );
+    }
+
+    let body;
+
+    /*
+     * FormData should remain FormData.
+     *
+     * URLSearchParams is only used for normal objects.
+     */
+    if (data instanceof FormData) {
+
+        body = data;
+
+    } else {
+
+        body = new URLSearchParams();
+
+        Object.entries(data).forEach(([key, value]) => {
+
+            if (value !== undefined && value !== null) {
+
+                body.append(
+                    key,
+                    String(value)
+                );
+            }
+        });
+    }
+
+
+    const headers = {
+        "X-CSRFToken": csrfToken,
+        "X-Requested-With": "XMLHttpRequest",
+        "Accept": "application/json"
+    };
+
+
+    /*
+     * Do NOT manually set Content-Type for FormData.
+     *
+     * The browser automatically creates:
+     *
+     * multipart/form-data; boundary=...
+     */
+    if (!(data instanceof FormData)) {
+
+        headers["Content-Type"] =
+            "application/x-www-form-urlencoded; charset=UTF-8";
+    }
+
+
+    const response = await fetch(url, {
+        method: "POST",
+        headers,
+        body,
+        credentials: "same-origin"
+    });
+
+
+    /*
+     * Django may return HTML for a CSRF error, login redirect,
+     * server error, etc. Handle that gracefully.
+     */
+    const contentType =
+        response.headers.get("content-type") || "";
+
+
+    let result = null;
+
+
+    if (contentType.includes("application/json")) {
+
+        try {
+
+            result = await response.json();
+
+        } catch (error) {
+
+            result = null;
+        }
+    }
+
+
+    if (!response.ok) {
+
+        if (response.status === 403) {
+
+            throw new Error(
+                "Your security token expired. Please refresh the page and try again."
+            );
+        }
+
+        if (response.status === 401) {
+
+            throw new Error(
+                "You need to sign in before performing this action."
+            );
+        }
+
+        if (response.status === 404) {
+
+            throw new Error(
+                "The requested action could not be found."
+            );
+        }
+
+        throw new Error(
+            result?.message ||
+            `Request failed (${response.status}).`
+        );
+    }
+
+
+    return result;
+}
+
+
+/* ============================================================
+   INITIALIZATION
+============================================================ */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        renderCategoryButtons();
+
+        renderProducts();
+
+        updateCartUI();
+
+        updateWishlistUI();
+
+        updateAuthenticationUI();
+
+
+        if (
+            ORDER_PLACED &&
+            ORDER_REFERENCE
+        ) {
+
+            const tracking =
+                document.getElementById(
+                    "orderTrackingId"
+                );
+
+            if (tracking) {
+                tracking.innerText =
+                    ORDER_REFERENCE;
+            }
+
+            const modal =
+                document.getElementById(
+                    "successModal"
+                );
+
+            if (modal) {
+                modal.classList.remove("hidden");
+            }
+        }
+
+
+        setupLoginForm();
+
+        setupSignupForm();
+
+        setupCheckoutForm();
+    }
+);
+
+
+/* ============================================================
+   LOGIN
+============================================================ */
+
+function setupLoginForm() {
+
+    const form =
+        document.getElementById("loginForm");
+
+    if (!form) return;
+
+
+    form.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const button =
+                form.querySelector(
+                    'button[type="submit"]'
+                );
+
+
+            const originalText =
+                button?.innerHTML || "Sign In";
+
+
+            if (button) {
+
+                button.disabled = true;
+
+                button.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Signing in...';
+            }
+
+
+            try {
+
+                const response =
+                    await postToDjango(
+                        form.action,
+                        new FormData(form)
+                    );
+
+
+                if (!response?.success) {
+
+                    throw new Error(
+                        response?.message ||
+                        "Invalid login details."
+                    );
+                }
+
+
+                IS_AUTHENTICATED = true;
+
+
+                if (response.cart) {
+
+                    cart =
+                        response.cart;
+                }
+
+
+                if (response.wishlist) {
+
+                    wishlist =
+                        new Set(
+                            response.wishlist
+                        );
+                }
+
+
+                updateCartUI();
+
+                updateWishlistUI();
+
+                renderProducts();
+
+                updateAuthenticationUI(response);
+
+                closeAuthModal();
+
+
+                showToast(
+                    response.message ||
+                    "Welcome back!",
+                    "success"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Login error:",
+                    error
+                );
+
+                showToast(
+                    error.message ||
+                    "Unable to sign in.",
+                    "error"
+                );
+
+
+            } finally {
+
+                if (button) {
+
+                    button.disabled = false;
+
+                    button.innerHTML =
+                        originalText;
+                }
+            }
+        }
+    );
+}
+
+
+/* ============================================================
+   SIGNUP
+============================================================ */
+
+function setupSignupForm() {
+
+    const form =
+        document.getElementById("signupForm");
+
+    if (!form) return;
+
+
+    form.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const password =
+                form.elements.password?.value || "";
+
+            const confirmation =
+                form.elements.password_confirmation?.value || "";
+
+
+            if (password !== confirmation) {
+
+                showToast(
+                    "Passwords do not match.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            const button =
+                form.querySelector(
+                    'button[type="submit"]'
+                );
+
+
+            const originalText =
+                button?.innerHTML ||
+                "Create Account";
+
+
+            if (button) {
+
+                button.disabled = true;
+
+                button.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Creating account...';
+            }
+
+
+            try {
+
+                const response =
+                    await postToDjango(
+                        form.action,
+                        new FormData(form)
+                    );
+
+
+                if (!response?.success) {
+
+                    throw new Error(
+                        response?.message ||
+                        "Unable to create account."
+                    );
+                }
+
+
+                IS_AUTHENTICATED = true;
+
+
+                if (response.cart) {
+
+                    cart =
+                        response.cart;
+                }
+
+
+                if (response.wishlist) {
+
+                    wishlist =
+                        new Set(
+                            response.wishlist
+                        );
+                }
+
+
+                updateCartUI();
+
+                updateWishlistUI();
+
+                renderProducts();
+
+                updateAuthenticationUI(response);
+
+                closeAuthModal();
+
+
+                showToast(
+                    response.message ||
+                    "Account created successfully!",
+                    "success"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Signup error:",
+                    error
+                );
+
+                showToast(
+                    error.message ||
+                    "Unable to create account.",
+                    "error"
+                );
+
+
+            } finally {
+
+                if (button) {
+
+                    button.disabled = false;
+
+                    button.innerHTML =
+                        originalText;
+                }
+            }
+        }
+    );
+}
+
+
+/* ============================================================
+   CHECKOUT
+============================================================ */
+
+function setupCheckoutForm() {
+
+    const form =
+        document.getElementById(
+            "checkoutForm"
+        );
+
+    if (!form) return;
+
+
+    form.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            if (!IS_AUTHENTICATED) {
+
+                closeCheckoutModal();
+
+                openAuthModal("login");
+
+                return;
+            }
+
+
+            if (cart.length === 0) {
+
+                showToast(
+                    "Your basket is empty.",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            const button =
+                form.querySelector(
+                    'button[type="submit"]'
+                );
+
+
+            const originalText =
+                button?.innerHTML ||
+                "Confirm Order Delivery";
+
+
+            if (button) {
+
+                button.disabled = true;
+
+                button.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing order...';
+            }
+
+
+            try {
+
+                const response =
+                    await postToDjango(
+                        form.action,
+                        new FormData(form)
+                    );
+
+
+                if (!response?.success) {
+
+                    throw new Error(
+                        response?.message ||
+                        "Unable to place order."
+                    );
+                }
+
+
+                cart =
+                    response.cart || [];
+
+
+                updateCartUI();
+
+
+                closeCheckoutModal();
+
+
+                const orderReference =
+                    response.order_reference ||
+                    response.reference ||
+                    "";
+
+
+                if (orderReference) {
+
+                    document
+                        .getElementById(
+                            "orderTrackingId"
+                        )
+                        .innerText =
+                        orderReference;
+                }
+
+
+                document
+                    .getElementById(
+                        "successModal"
+                    )
+                    .classList.remove(
+                        "hidden"
+                    );
+
+
+                showToast(
+                    response.message ||
+                    "Order placed successfully!",
+                    "success"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Checkout error:",
+                    error
+                );
+
+                showToast(
+                    error.message ||
+                    "Unable to place order.",
+                    "error"
+                );
+
+
+            } finally {
+
+                if (button) {
+
+                    button.disabled = false;
+
+                    button.innerHTML =
+                        originalText;
+                }
+            }
+        }
+    );
+}
+
+
+/* ============================================================
+   CATEGORY FILTER
+============================================================ */
+
+function renderCategoryButtons() {
+
+    const container =
+        document.getElementById(
+            "categoryButtonsContainer"
+        );
+
+    if (!container) return;
+
+
+    const categories = [
+        {
+            id: "all",
+            label: "All Fruits",
+            icon: "fa-layer-group"
+        },
+        ...CATEGORIES
+    ];
+
+
+    container.innerHTML =
+        categories.map(category => {
+
+            const active =
+                String(category.id) ===
+                String(currentCategory);
+
+
+            return `
+                <button
+                    type="button"
+                    onclick="filterCategory('${escapeHtml(category.id)}')"
+                    class="px-4 py-2 rounded-full text-xs font-extrabold flex items-center gap-2 whitespace-nowrap transition-all ${
+                        active
+                            ? "bg-brand-dark text-brand-lemon shadow-md"
+                            : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
+                    }"
+                >
+                    <i class="fa-solid ${escapeHtml(category.icon || "fa-lemon")}"></i>
+                    <span>${escapeHtml(category.label || category.name || "")}</span>
+                </button>
+            `;
+
+        }).join("");
+}
+
+
+function filterCategory(categoryId) {
+
+    currentCategory =
+        String(categoryId);
+
+    renderCategoryButtons();
+
+    renderProducts();
+}
+
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+function handleSearch(value) {
+
+    searchQuery =
+        String(value || "")
+            .trim()
+            .toLowerCase();
+
+
+    const desktop =
+        document.getElementById(
+            "searchInput"
+        );
+
+    const mobile =
+        document.getElementById(
+            "mobileSearchInput"
+        );
+
+
+    if (
+        desktop &&
+        desktop.value !== value
+    ) {
+        desktop.value = value;
+    }
+
+
+    if (
+        mobile &&
+        mobile.value !== value
+    ) {
+        mobile.value = value;
+    }
+
+
+    const clearButton =
+        document.getElementById(
+            "clearSearchBtn"
+        );
+
+
+    if (clearButton) {
+
+        clearButton.classList.toggle(
+            "hidden",
+            !searchQuery
+        );
+    }
+
+
+    renderProducts();
+}
+
+
+function clearSearch() {
+
+    searchQuery = "";
+
+
+    const desktop =
+        document.getElementById(
+            "searchInput"
+        );
+
+    const mobile =
+        document.getElementById(
+            "mobileSearchInput"
+        );
+
+
+    if (desktop) {
+        desktop.value = "";
+    }
+
+
+    if (mobile) {
+        mobile.value = "";
+    }
+
+
+    const clearButton =
+        document.getElementById(
+            "clearSearchBtn"
+        );
+
+
+    if (clearButton) {
+        clearButton.classList.add(
+            "hidden"
+        );
+    }
+
+
+    renderProducts();
+}
+
+
+function resetFilters() {
+
+    clearSearch();
+
+    filterCategory("all");
+}
+
+
+function toggleMobileSearch() {
+
+    const element =
+        document.getElementById(
+            "mobileSearchContainer"
+        );
+
+    if (element) {
+
+        element.classList.toggle(
+            "hidden"
+        );
+    }
+}
+
+
+/* ============================================================
+   PRODUCTS
+============================================================ */
+
+function renderProducts() {
+
+    const grid =
+        document.getElementById(
+            "productsGrid"
+        );
+
+    const emptyState =
+        document.getElementById(
+            "emptyState"
+        );
+
+
+    if (!grid || !emptyState) return;
+
+
+    const filtered =
+        PRODUCTS.filter(product => {
+
+            const categoryMatch =
+                currentCategory === "all" ||
+                String(product.category_id) ===
+                String(currentCategory);
+
+
+            const searchableText = [
+                product.name,
+                product.description,
+                product.category_name
+            ]
+                .join(" ")
+                .toLowerCase();
+
+
+            const searchMatch =
+                searchableText.includes(
+                    searchQuery
+                );
+
+
+            return (
+                categoryMatch &&
+                searchMatch
+            );
+        });
+
+
+    const count =
+        document.getElementById(
+            "displayedCount"
+        );
+
+
+    if (count) {
+
+        count.innerText =
+            filtered.length;
+    }
+
+
+    if (filtered.length === 0) {
+
+        grid.innerHTML = "";
+
+        emptyState.classList.remove(
+            "hidden"
+        );
+
+        return;
+    }
+
+
+    emptyState.classList.add(
+        "hidden"
+    );
+
+
+    grid.innerHTML =
+        filtered.map(
+            renderProductCard
+        ).join("");
+}
+
+
+function renderProductCard(product) {
+
+    const id =
+        Number(product.id);
+
+    const liked =
+        wishlist.has(id);
+
+    const price =
+        Number(product.price || 0);
+
+    const stock =
+        Number(product.stock || 0);
+
+    const available =
+        Boolean(product.is_active) &&
+        stock > 0;
+
+
+    return `
+        <div class="bg-white rounded-3xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
+
+            <div
+                class="relative bg-slate-50 p-4 cursor-pointer overflow-hidden"
+                onclick="openProductModal(${id})"
+            >
+
+                ${
+                    available
+                        ? `
+                        <span class="absolute top-3 left-3 z-10 bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full">
+                            <i class="fa-solid fa-leaf text-emerald-600"></i>
+                            Fresh
+                        </span>
+                        `
+                        : `
+                        <span class="absolute top-3 left-3 z-10 bg-rose-100 text-rose-700 text-[10px] font-bold px-2.5 py-1 rounded-full">
+                            Out of Stock
+                        </span>
+                        `
+                }
+
+
+                <button
+                    type="button"
+                    onclick="event.stopPropagation(); toggleWishlist(${id})"
+                    class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-sm"
+                >
+                    <i class="${
+                        liked
+                            ? "fa-solid text-rose-500"
+                            : "fa-regular text-slate-400"
+                    } fa-heart text-sm"></i>
+                </button>
+
+
+                ${
+                    product.image
+                        ? `
+                        <img
+                            src="${escapeAttribute(product.image)}"
+                            alt="${escapeAttribute(product.name)}"
+                            loading="lazy"
+                            class="w-full h-48 object-contain group-hover:scale-105 transition-transform duration-300"
+                        >
+                        `
+                        : `
+                        <div class="w-full h-48 flex items-center justify-center text-slate-300 text-6xl">
+                            <i class="fa-solid fa-lemon"></i>
+                        </div>
+                        `
+                }
+
+            </div>
+
+
+            <div class="p-5 flex-1 flex flex-col justify-between">
+
+                <div>
+
+                    <div class="flex items-center justify-between text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1">
+
+                        <span>
+                            ${escapeHtml(product.category_name)}
+                        </span>
+
+                        <span class="text-amber-500 flex items-center gap-1">
+                            <i class="fa-solid fa-star text-[10px]"></i>
+                            ${Number(product.rating || 0).toFixed(1)}
+                        </span>
+
+                    </div>
+
+
+                    <h3
+                        onclick="openProductModal(${id})"
+                        class="font-extrabold text-brand-dark text-base hover:text-brand-light cursor-pointer line-clamp-1"
+                    >
+                        ${escapeHtml(product.name)}
+                    </h3>
+
+
+                    <p class="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                        ${escapeHtml(product.description)}
+                    </p>
+
+                </div>
+
+
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+
+                    <div>
+
+                        <span class="text-xs text-slate-400 block">
+                            Price
+                        </span>
+
+                        <span class="text-xl font-black text-brand-dark">
+                            ₦${price.toFixed(2)}
+                        </span>
+
+                        <span class="text-[10px] text-slate-500">
+                            ${escapeHtml(product.unit || "")}
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        ${available ? "" : "disabled"}
+                        onclick="event.stopPropagation(); quickAddToCart(${id})"
+                        class="bg-brand-lemon hover:bg-brand-lemonHover disabled:bg-slate-200 disabled:text-slate-400 text-brand-dark font-extrabold px-4 py-2.5 rounded-2xl shadow-sm text-xs flex items-center gap-1.5"
+                    >
+                        <i class="fa-solid fa-plus"></i>
+                        ${available ? "Add" : "Unavailable"}
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* ============================================================
+   PRODUCT MODAL
+============================================================ */
+
+function openProductModal(productId) {
+
+    const product =
+        PRODUCTS.find(
+            item =>
+                Number(item.id) ===
+                Number(productId)
+        );
+
+
+    if (!product) return;
+
+
+    activeModalProduct =
+        product;
+
+    modalQuantity = 1;
+
+
+    setText(
+        "modalTitle",
+        product.name
+    );
+
+    setText(
+        "modalCategoryName",
+        product.category_name
+    );
+
+    setText(
+        "modalUnitPrice",
+        `₦${Number(product.price || 0).toFixed(2)}`
+    );
+
+    setText(
+        "modalUnitType",
+        product.unit || ""
+    );
+
+    setText(
+        "modalDescription",
+        product.description || ""
+    );
+
+
+    /*
+     * These fields do not currently exist in your Product model.
+     * Therefore we use honest fallback text instead of fake data.
+     */
+    setText(
+        "modalFarmOrigin",
+        product.farm_origin ||
+        "Supplier information unavailable"
+    );
+
+    setText(
+        "modalHarvestDate",
+        product.harvest_date ||
+        "Harvest date unavailable"
+    );
+
+    setText(
+        "modalShelfLife",
+        product.shelf_life ||
+        "Store according to fruit type"
+    );
+
+
+    setText(
+        "modalRatingScore",
+        Number(product.rating || 0).toFixed(1)
+    );
+
+    setText(
+        "modalReviewCount",
+        `${product.review_count || 0} reviews`
+    );
+
+
+    /*
+     * Nutrition
+     */
+    setNutrition(
+        "modalCal",
+        product.calories,
+        "kcal"
+    );
+
+    setNutrition(
+        "modalFiber",
+        product.fiber,
+        "g"
+    );
+
+    setNutrition(
+        "modalPotassium",
+        product.potassium,
+        "mg"
+    );
+
+
+    const vitamins = [];
+
+
+    if (
+        product.vitamin_c !== null &&
+        product.vitamin_c !== undefined &&
+        product.vitamin_c !== "—"
+    ) {
+
+        vitamins.push(
+            `C ${product.vitamin_c}mg`
+        );
+    }
+
+
+    if (
+        product.vitamin_e !== null &&
+        product.vitamin_e !== undefined &&
+        product.vitamin_e !== "—"
+    ) {
+
+        vitamins.push(
+            `E ${product.vitamin_e}mg`
+        );
+    }
+
+
+    setText(
+        "modalVit",
+        vitamins.length
+            ? vitamins.join(" • ")
+            : "—"
+    );
+
+
+    /*
+     * Rating stars
+     */
+    const rating =
+        Number(product.rating || 0);
+
+    const stars =
+        document.getElementById(
+            "modalRatingStars"
+        );
+
+
+    if (stars) {
+
+        stars.innerHTML =
+            Array.from(
+                { length: 5 },
+                (_, index) => `
+                    <i class="fa-solid fa-star ${
+                        index < Math.round(rating)
+                            ? "text-amber-400"
+                            : "text-slate-200"
+                    }"></i>
+                `
+            ).join("");
+    }
+
+
+    /*
+     * Organic badge
+     */
+    const organicBadge =
+        document.getElementById(
+            "modalOrganicBadge"
+        );
+
+
+    if (organicBadge) {
+
+        organicBadge.classList.toggle(
+            "hidden",
+            !product.is_organic
+        );
+    }
+
+
+    /*
+     * Stock status
+     */
+    const stockStatus =
+        document.getElementById(
+            "modalStockStatus"
+        );
+
+
+    if (stockStatus) {
+
+        const inStock =
+            Boolean(product.is_active) &&
+            Number(product.stock) > 0;
+
+
+        stockStatus.innerHTML =
+            inStock
+                ? `
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                    In Stock
+                `
+                : `
+                    <span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span>
+                    Out of Stock
+                `;
+    }
+
+
+    /*
+     * Main image
+     */
+    const image =
+        document.getElementById(
+            "modalMainImage"
+        );
+
+
+    if (image) {
+
+        if (product.image) {
+
+            image.src =
+                product.image;
+
+            image.classList.remove(
+                "hidden"
+            );
+
+        } else {
+
+            image.removeAttribute(
+                "src"
+            );
+
+            image.classList.add(
+                "hidden"
+            );
+        }
+    }
+
+
+    /*
+     * Thumbnail
+     */
+    const thumbnails =
+        document.getElementById(
+            "modalThumbnails"
+        );
+
+
+    if (thumbnails) {
+
+        thumbnails.innerHTML =
+            product.image
+                ? `
+                    <button
+                        type="button"
+                        onclick="setModalMainImage(this.dataset.image)"
+                        data-image="${escapeAttribute(product.image)}"
+                        class="w-14 h-14 rounded-xl border border-slate-200 bg-white p-1 overflow-hidden"
+                    >
+                        <img
+                            src="${escapeAttribute(product.image)}"
+                            class="w-full h-full object-contain"
+                        >
+                    </button>
+                `
+                : "";
+    }
+
+
+    updateModalWishlistIcon();
+
+    updateModalPriceDisplay();
+
+
+    document
+        .getElementById(
+            "productModal"
+        )
+        .classList.remove(
+            "hidden"
+        );
+
+
+    document.body.style.overflow =
+        "hidden";
+}
+
+
+function setModalMainImage(url) {
+
+    const image =
+        document.getElementById(
+            "modalMainImage"
+        );
+
+    if (image) {
+        image.src = url;
+    }
+}
+
+
+function closeProductModal() {
+
+    document
+        .getElementById(
+            "productModal"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+    document.body.style.overflow =
+        "";
+
+    activeModalProduct =
+        null;
+}
+
+
+function updateModalQuantity(delta) {
+
+    if (!activeModalProduct) return;
+
+
+    const stock =
+        Number(
+            activeModalProduct.stock || 0
+        );
+
+
+    if (stock <= 0) return;
+
+
+    modalQuantity =
+        Math.min(
+            stock,
+            Math.max(
+                1,
+                modalQuantity + delta
+            )
+        );
+
+
+    updateModalPriceDisplay();
+}
+
+
+function updateModalPriceDisplay() {
+
+    if (!activeModalProduct) return;
+
+
+    setText(
+        "modalQtyDisplay",
+        modalQuantity
+    );
+
+
+    const total =
+        Number(
+            activeModalProduct.price || 0
+        ) * modalQuantity;
+
+
+    setText(
+        "modalTotalPrice",
+        `₦${total.toFixed(2)}`
+    );
+}
+
+
+async function toggleModalWishlist() {
+
+    if (!activeModalProduct) return;
+
+    await toggleWishlist(
+        activeModalProduct.id
+    );
+}
+
+
+function updateModalWishlistIcon() {
+
+    if (!activeModalProduct) return;
+
+
+    const icon =
+        document.getElementById(
+            "modalWishlistIcon"
+        );
+
+
+    if (!icon) return;
+
+
+    const liked =
+        wishlist.has(
+            Number(
+                activeModalProduct.id
+            )
+        );
+
+
+    icon.className =
+        liked
+            ? "fa-solid fa-heart text-rose-500"
+            : "fa-regular fa-heart";
+}
+
+
+async function addModalItemToCart() {
+
+    if (!activeModalProduct) return;
+
+
+    const product =
+        activeModalProduct;
+
+
+    const stock =
+        Number(product.stock || 0);
+
+
+    if (stock <= 0) {
+
+        showToast(
+            "This product is currently out of stock.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const quantity =
+        modalQuantity;
+
+
+    closeProductModal();
+
+
+    await addToCart(
+        product.id,
+        quantity
+    );
+}
+
+
+/* ============================================================
+   CART
+============================================================ */
+
+async function quickAddToCart(productId) {
+
+    if (!IS_AUTHENTICATED) {
+
+        openAuthModal("login");
+
+        return;
+    }
+
+
+    await addToCart(
+        productId,
+        1
+    );
+}
+
+
+async function addToCart(
+    productId,
+    quantity = 1
+) {
+
+    if (!IS_AUTHENTICATED) {
+
+        openAuthModal("login");
+
+        return;
+    }
+
+
+    const product =
+        PRODUCTS.find(
+            item =>
+                Number(item.id) ===
+                Number(productId)
+        );
+
+
+    if (!product) return;
+
+
+    const requested =
+        Number(quantity);
+
+
+    if (
+        !Number.isInteger(requested) ||
+        requested < 1
+    ) {
+
+        showToast(
+            "Invalid quantity.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const existing =
+        cart.find(
+            item =>
+                Number(item.product.id) ===
+                Number(productId)
+        );
+
+
+    const currentQuantity =
+        Number(
+            existing?.quantity || 0
+        );
+
+
+    const desiredQuantity =
+        currentQuantity +
+        requested;
+
+
+    if (
+        desiredQuantity >
+        Number(product.stock)
+    ) {
+
+        showToast(
+            `Only ${product.stock} item(s) are available.`,
+            "error"
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await postToDjango(
+                "{% url 'app:add_to_cart' 0 %}"
+                    .replace(
+                        "/0/",
+                        `/${productId}/`
+                    ),
+                {
+                    quantity: requested
+                }
+            );
+
+
+        if (!response?.success) {
+
+            throw new Error(
+                response?.message ||
+                "Unable to add item to basket."
+            );
+        }
+
+
+        cart =
+            response.cart || cart;
+
+
+        updateCartUI();
+
+
+        showToast(
+            response.message ||
+            `${product.name} added to your basket!`,
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Add cart error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Unable to add item to basket.",
+            "error"
+        );
+    }
+}
+
+
+async function updateCartQuantity(
+    productId,
+    delta
+) {
+
+    const item =
+        cart.find(
+            cartItem =>
+                Number(cartItem.product.id) ===
+                Number(productId)
+        );
+
+
+    if (!item) return;
+
+
+    const current =
+        Number(item.quantity);
+
+
+    const newQuantity =
+        current +
+        Number(delta);
+
+
+    /*
+     * Zero means remove.
+     */
+    if (newQuantity <= 0) {
+
+        await removeCartItem(
+            productId
+        );
+
+        return;
+    }
+
+
+    if (
+        newQuantity >
+        Number(item.product.stock)
+    ) {
+
+        showToast(
+            `Only ${item.product.stock} item(s) are available.`,
+            "error"
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await postToDjango(
+                "{% url 'app:update_cart' 0 %}"
+                    .replace(
+                        "/0/",
+                        `/${productId}/`
+                    ),
+                {
+                    quantity: newQuantity
+                }
+            );
+
+
+        if (!response?.success) {
+
+            throw new Error(
+                response?.message ||
+                "Unable to update basket."
+            );
+        }
+
+
+        cart =
+            response.cart || cart;
+
+
+        updateCartUI();
+
+
+    } catch (error) {
+
+        console.error(
+            "Cart update error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Unable to update basket.",
+            "error"
+        );
+    }
+}
+
+
+async function removeCartItem(productId) {
+
+    try {
+
+        const response =
+            await postToDjango(
+                "{% url 'app:remove_from_cart' 0 %}"
+                    .replace(
+                        "/0/",
+                        `/${productId}/`
+                    )
+            );
+
+
+        if (!response?.success) {
+
+            throw new Error(
+                response?.message ||
+                "Unable to remove item."
+            );
+        }
+
+
+        cart =
+            response.cart || [];
+
+
+        updateCartUI();
+
+
+        showToast(
+            response.message ||
+            "Item removed from basket.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Remove cart error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Unable to remove item.",
+            "error"
+        );
+    }
+}
+
+
+/* ============================================================
+   CART UI
+============================================================ */
+
+function updateCartUI() {
+
+    const totalItems =
+        cart.reduce(
+            (total, item) =>
+                total +
+                Number(item.quantity || 0),
+            0
+        );
+
+
+    setText(
+        "cartCountBadge",
+        totalItems
+    );
+
+
+    const subtotal =
+        cart.reduce(
+            (total, item) =>
+                total +
+                (
+                    Number(
+                        item.product.price || 0
+                    ) *
+                    Number(
+                        item.quantity || 0
+                    )
+                ),
+            0
+        );
+
+
+    const deliveryFee =
+        subtotal <= 0
+            ? 0
+            : subtotal >= FREE_DELIVERY_THRESHOLD
+                ? 0
+                : DELIVERY_FEE;
+
+
+    const total =
+        subtotal +
+        deliveryFee;
+
+
+    setText(
+        "cartSubtotal",
+        `₦${subtotal.toFixed(2)}`
+    );
+
+
+    setText(
+        "cartDeliveryFee",
+        deliveryFee === 0
+            ? "FREE"
+            : `₦${deliveryFee.toFixed(2)}`
+    );
+
+
+    setText(
+        "cartTotal",
+        `₦${total.toFixed(2)}`
+    );
+
+
+    setText(
+        "checkoutTotalDisplay",
+        `₦${total.toFixed(2)}`
+    );
+
+
+    /*
+     * Free delivery progress
+     */
+    const percentage =
+        Math.min(
+            100,
+            (
+                subtotal /
+                FREE_DELIVERY_THRESHOLD
+            ) * 100
+        );
+
+
+    const remaining =
+        Math.max(
+            0,
+            FREE_DELIVERY_THRESHOLD -
+            subtotal
+        );
+
+
+    const bar =
+        document.getElementById(
+            "freeShippingBar"
+        );
+
+
+    if (bar) {
+
+        bar.style.width =
+            `${percentage}%`;
+    }
+
+
+    setText(
+        "freeShippingPercent",
+        `${Math.round(percentage)}%`
+    );
+
+
+    setText(
+        "freeShippingText",
+        remaining === 0
+            ? "🎉 You unlocked FREE Local Delivery!"
+            : `Add ₦${remaining.toFixed(2)} for FREE Delivery`
+    );
+
+
+    const container =
+        document.getElementById(
+            "cartItemsContainer"
+        );
+
+
+    if (!container) return;
+
+
+    const checkoutButton =
+        document.getElementById(
+            "checkoutBtn"
+        );
+
+
+    if (cart.length === 0) {
+
+        container.innerHTML = `
+            <div class="text-center py-12">
+
+                <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 text-2xl mx-auto mb-3">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                </div>
+
+                <p class="font-bold text-slate-700">
+                    Your basket is empty
+                </p>
+
+                <p class="text-xs text-slate-400 mt-1">
+                    Explore our fresh fruits and add something delicious!
+                </p>
+
+            </div>
+        `;
+
+
+        if (checkoutButton) {
+
+            checkoutButton.disabled = true;
+
+            checkoutButton.classList.add(
+                "opacity-50",
+                "cursor-not-allowed"
+            );
+        }
+
+
+        return;
+    }
+
+
+    if (checkoutButton) {
+
+        checkoutButton.disabled = false;
+
+        checkoutButton.classList.remove(
+            "opacity-50",
+            "cursor-not-allowed"
+        );
+    }
+
+
+    container.innerHTML =
+        cart.map(item => {
+
+            const product =
+                item.product;
+
+            const quantity =
+                Number(item.quantity);
+
+            const price =
+                Number(product.price || 0);
+
+
+            return `
+                <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200/60">
+
+                    ${
+                        product.image
+                            ? `
+                            <img
+                                src="${escapeAttribute(product.image)}"
+                                alt="${escapeAttribute(product.name)}"
+                                class="w-16 h-16 object-contain bg-white rounded-xl p-1 border border-slate-100"
+                            >
+                            `
+                            : `
+                            <div class="w-16 h-16 bg-white rounded-xl border border-slate-100 flex items-center justify-center text-slate-300 text-xl">
+                                <i class="fa-solid fa-lemon"></i>
+                            </div>
+                            `
+                    }
+
+
+                    <div class="flex-1 min-w-0">
+
+                        <h4 class="font-bold text-brand-dark text-sm truncate">
+                            ${escapeHtml(product.name)}
+                        </h4>
+
+                        <p class="text-xs font-semibold text-slate-500">
+                            ₦${price.toFixed(2)}
+                            ${escapeHtml(product.unit || "")}
+                        </p>
+
+
+                        <div class="flex items-center gap-2 mt-2">
+
+                            <button
+                                type="button"
+                                onclick="updateCartQuantity(${product.id}, -1)"
+                                class="w-6 h-6 rounded-full bg-white border border-slate-300 text-slate-600 text-xs flex items-center justify-center"
+                            >
+                                <i class="fa-solid fa-minus"></i>
+                            </button>
+
+
+                            <span class="text-xs font-bold text-slate-800 w-5 text-center">
+                                ${quantity}
+                            </span>
+
+
+                            <button
+                                type="button"
+                                onclick="updateCartQuantity(${product.id}, 1)"
+                                class="w-6 h-6 rounded-full bg-white border border-slate-300 text-slate-600 text-xs flex items-center justify-center"
+                            >
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="text-right flex-shrink-0">
+
+                        <span class="font-extrabold text-sm text-brand-dark block">
+                            ₦${(
+                                price *
+                                quantity
+                            ).toFixed(2)}
+                        </span>
+
+
+                        <button
+                            type="button"
+                            onclick="removeCartItem(${product.id})"
+                            class="text-slate-400 hover:text-rose-500 text-xs mt-2"
+                        >
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+}
+
+
+function toggleCartDrawer() {
+
+    if (!IS_AUTHENTICATED) {
+
+        openAuthModal("login");
+
+        return;
+    }
+
+
+    const drawer =
+        document.getElementById(
+            "cartDrawer"
+        );
+
+
+    if (!drawer) return;
+
+
+    drawer.classList.toggle(
+        "hidden"
+    );
+
+
+    if (
+        !drawer.classList.contains(
+            "hidden"
+        )
+    ) {
+
+        document.body.style.overflow =
+            "hidden";
+
+    } else {
+
+        document.body.style.overflow =
+            "";
+    }
+}
+
+
+/* ============================================================
+   WISHLIST
+============================================================ */
+
+async function toggleWishlist(productId) {
+
+    if (!IS_AUTHENTICATED) {
+
+        openAuthModal("login");
+
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await postToDjango(
+                "{% url 'app:toggle_wishlist' 0 %}"
+                    .replace(
+                        "/0/",
+                        `/${productId}/`
+                    )
+            );
+
+
+        if (!response?.success) {
+
+            throw new Error(
+                response?.message ||
+                "Unable to update favorites."
+            );
+        }
+
+
+        wishlist =
+            new Set(
+                response.wishlist ||
+                wishlist
+            );
+
+
+        updateWishlistUI();
+
+        renderProducts();
+
+        updateModalWishlistIcon();
+
+
+        showToast(
+            response.message ||
+            "Favorites updated.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Wishlist error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Unable to update favorites.",
+            "error"
+        );
+    }
+}
+
+
+function updateWishlistUI() {
+
+    setText(
+        "wishlistCount",
+        wishlist.size
+    );
+}
+
+
+function openWishlistModal() {
+
+    if (!IS_AUTHENTICATED) {
+
+        openAuthModal("login");
+
+        return;
+    }
+
+
+    const products =
+        PRODUCTS.filter(
+            product =>
+                wishlist.has(
+                    Number(product.id)
+                )
+        );
+
+
+    if (products.length === 0) {
+
+        showToast(
+            "Your favorites list is empty.",
+            "info"
+        );
+
+        return;
+    }
+
+
+    /*
+     * For now show the first favorite.
+     * This can later become a proper wishlist modal.
+     */
+    openProductModal(
+        products[0].id
+    );
+}
+
+
+/* ============================================================
+   AUTH MODAL
+============================================================ */
+
+function openAuthModal(
+    mode = "login"
+) {
+
+    const modal =
+        document.getElementById(
+            "authModal"
+        );
+
+
+    if (!modal) return;
+
+
+    modal.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.style.overflow =
+        "hidden";
+
+
+    switchAuthMode(
+        mode
+    );
+}
+
+
+function closeAuthModal() {
+
+    const modal =
+        document.getElementById(
+            "authModal"
+        );
+
+
+    if (modal) {
+
+        modal.classList.add(
+            "hidden"
+        );
+    }
+
+
+    document.body.style.overflow =
+        "";
+}
+
+
+function switchAuthMode(mode) {
+
+    const loginForm =
+        document.getElementById(
+            "loginForm"
+        );
+
+    const signupForm =
+        document.getElementById(
+            "signupForm"
+        );
+
+    const loginTab =
+        document.getElementById(
+            "loginTab"
+        );
+
+    const signupTab =
+        document.getElementById(
+            "signupTab"
+        );
+
+    const title =
+        document.getElementById(
+            "authModalTitle"
+        );
+
+
+    const login =
+        mode === "login";
+
+
+    loginForm?.classList.toggle(
+        "hidden",
+        !login
+    );
+
+    signupForm?.classList.toggle(
+        "hidden",
+        login
+    );
+
+
+    loginTab?.classList.toggle(
+        "bg-white",
+        login
+    );
+
+    loginTab?.classList.toggle(
+        "text-brand-dark",
+        login
+    );
+
+
+    signupTab?.classList.toggle(
+        "bg-white",
+        !login
+    );
+
+    signupTab?.classList.toggle(
+        "text-brand-dark",
+        !login
+    );
+
+
+    if (title) {
+
+        title.innerText =
+            login
+                ? "Welcome Back"
+                : "Create Your Account";
+    }
+}
+
+
+/* ============================================================
+   AUTHENTICATION UI
+============================================================ */
+
+function updateAuthenticationUI(response = {}) {
+
+    const container =
+        document.getElementById(
+            "authHeaderContainer"
+        );
+
+
+    if (!container) return;
+
+
+    if (IS_AUTHENTICATED) {
+
+        container.innerHTML = `
+            <button
+                id="logoutHeaderBtn"
+                type="button"
+                onclick="logoutUser()"
+                class="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-brand-dark px-3 py-2 rounded-full hover:bg-slate-100 transition-colors"
+            >
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+            </button>
+        `;
+
+    } else {
+
+        container.innerHTML = `
+            <button
+                id="loginHeaderBtn"
+                type="button"
+                onclick="openAuthModal('login')"
+                class="hidden sm:flex items-center gap-2 text-xs font-bold text-brand-dark px-3 py-2 rounded-full hover:bg-slate-100 transition-colors"
+            >
+                <i class="fa-solid fa-user"></i>
+                Sign in
+            </button>
+        `;
+    }
+}
+
+
+/* ============================================================
+   LOGOUT
+============================================================ */
+
+async function logoutUser() {
+
+    try {
+
+        const response =
+            await postToDjango(
+                "{{ logout_url }}"
+            );
+
+
+        if (!response?.success) {
+
+            throw new Error(
+                response?.message ||
+                "Unable to logout."
+            );
+        }
+
+
+        IS_AUTHENTICATED =
+            false;
+
+        cart = [];
+
+        wishlist =
+            new Set();
+
+
+        updateCartUI();
+
+        updateWishlistUI();
+
+        renderProducts();
+
+        updateAuthenticationUI(
+            response
+        );
+
+
+        closeAuthModal();
+
+        closeProductModal();
+
+        closeCheckoutModal();
+
+
+        showToast(
+            response.message ||
+            "You have been logged out.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Logout error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Unable to logout.",
+            "error"
+        );
+    }
+}
+
+
+/* ============================================================
+   CHECKOUT MODAL
+============================================================ */
+
+function openCheckoutModal() {
+
+    if (!IS_AUTHENTICATED) {
+
+        openAuthModal("login");
+
+        return;
+    }
+
+
+    if (cart.length === 0) {
+
+        showToast(
+            "Your basket is empty.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const drawer =
+        document.getElementById(
+            "cartDrawer"
+        );
+
+
+    const checkout =
+        document.getElementById(
+            "checkoutModal"
+        );
+
+
+    drawer?.classList.add(
+        "hidden"
+    );
+
+
+    checkout?.classList.remove(
+        "hidden"
+    );
+
+
+    document.body.style.overflow =
+        "hidden";
+
+
+    updateCartUI();
+}
+
+
+function closeCheckoutModal() {
+
+    document
+        .getElementById(
+            "checkoutModal"
+        )
+        ?.classList.add(
+            "hidden"
+        );
+
+
+    document.body.style.overflow =
+        "";
+}
+
+
+function closeSuccessModal() {
+
+    document
+        .getElementById(
+            "successModal"
+        )
+        ?.classList.add(
+            "hidden"
+        );
+
+
+    document.body.style.overflow =
+        "";
+
+
+    /*
+     * Remove ?order=... without
+     * reloading the page.
+     */
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    url.searchParams.delete(
+        "order"
+    );
+
+
+    window.history.replaceState(
+        {},
+        document.title,
+        url.toString()
+    );
+}
+
+
+/* ============================================================
+   TOAST
+============================================================ */
+
+function showToast(
+    message,
+    type = "success"
+) {
+
+    const container =
+        document.getElementById(
+            "toastContainer"
+        );
+
+
+    if (!container) return;
+
+
+    const toast =
+        document.createElement(
+            "div"
+        );
+
+
+    const isSuccess =
+        type === "success";
+
+
+    const isError =
+        type === "error";
+
+
+    toast.className =
+        `
+        ${
+            isSuccess
+                ? "bg-brand-dark"
+                : isError
+                    ? "bg-rose-600"
+                    : "bg-slate-800"
+        }
+        text-white
+        text-xs
+        font-bold
+        px-4
+        py-3
+        rounded-2xl
+        shadow-xl
+        flex
+        items-center
+        gap-2.5
+        pointer-events-auto
+        pop-in
+        border
+        border-white/10
+        max-w-sm
+        `;
+
+
+    const icon =
+        isSuccess
+            ? "fa-circle-check text-brand-lemon"
+            : isError
+                ? "fa-circle-exclamation text-white"
+                : "fa-circle-info text-blue-400";
+
+
+    const iconElement =
+        document.createElement(
+            "i"
+        );
+
+
+    iconElement.className =
+        `fa-solid ${icon} text-base`;
+
+
+    const textElement =
+        document.createElement(
+            "span"
+        );
+
+
+    textElement.innerText =
+        String(message || "");
+
+
+    toast.appendChild(
+        iconElement
+    );
+
+    toast.appendChild(
+        textElement
+    );
+
+
+    container.appendChild(
+        toast
+    );
+
+
+    setTimeout(
+        () => {
+
+            toast.style.opacity =
+                "0";
+
+            toast.style.transition =
+                "opacity 0.3s ease";
+
+
+            setTimeout(
+                () => toast.remove(),
+                300
+            );
+
+        },
+        3000
+    );
+}
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+function setText(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(id);
+
+
+    if (element) {
+
+        element.innerText =
+            String(
+                value ?? ""
+            );
+    }
+}
+
+
+function setNutrition(
+    id,
+    value,
+    unit
+) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === "" ||
+        value === "—"
+    ) {
+
+        setText(
+            id,
+            "—"
+        );
+
+        return;
+    }
+
+
+    setText(
+        id,
+        `${value}${unit}`
+    );
+}
+
+
+function escapeHtml(value) {
+
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+function escapeAttribute(value) {
+
+    return escapeHtml(value);
+}
+
+
+/* ============================================================
+   KEYBOARD / ESCAPE
+============================================================ */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (event.key !== "Escape") {
+            return;
+        }
+
+
+        closeProductModal();
+
+        closeAuthModal();
+
+        closeCheckoutModal();
+
+        document
+            .getElementById(
+                "cartDrawer"
+            )
+            ?.classList.add(
+                "hidden"
+            );
+
+
+        document.body.style.overflow =
+            "";
+    }
+);
+</script>
+</body>
+</html>

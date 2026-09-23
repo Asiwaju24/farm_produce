@@ -1,0 +1,156 @@
+# ================================
+
+# Python
+
+# ================================
+
+**pycache**/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Virtual environments
+
+venv/
+env/
+.venv/
+.env/
+ENV/
+env.bak/
+venv.bak/
+
+# ================================
+
+# Django
+
+# ================================
+
+*.log
+db.sqlite3
+db.sqlite3-journal
+
+# Django static/media files
+
+/static/
+/media/
+
+# Collected static files
+
+staticfiles/
+
+# ================================
+
+# Environment & Secrets
+
+# ================================
+
+.env
+.env.*
+!.env.example
+
+# ================================
+
+# IDEs & Editors
+
+# ================================
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+
+# ================================
+
+# OS Generated Files
+
+# ================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ================================
+
+# Testing / Coverage
+
+# ================================
+
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+*.cover
+
+# ================================
+
+# Build / Distribution
+
+# ================================
+
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ================================
+
+# Jupyter
+
+# ================================
+
+.ipynb_checkpoints/
+
+# ================================
+
+# Type Checking
+
+# ================================
+
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# ================================
+
+# Documentation
+
+# ================================
+
+docs/_build/
+
+# ================================
+
+# Local Development
+
+# ================================
+
+*.sqlite3
+*.sqlite3-journal
+
+# ================================
+
+# Secrets / Certificates
+
+# ================================
+
+*.pem
+*.key
+*.crt
+
+# ================================
+
+# Temporary Files
+
+# ================================
+
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*.orig
